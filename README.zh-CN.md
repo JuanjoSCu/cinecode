@@ -8,7 +8,8 @@
 </p>
 
 <p align="center">
-  <a href="README.md">Türkçe</a> ·
+  <a href="README.md">Español</a> ·
+  <a href="README.tr.md">Türkçe</a> ·
   <a href="README.en.md">English</a> ·
   <a href="README.ja.md">日本語</a> ·
   <a href="#安装">安装</a> ·
