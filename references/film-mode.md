@@ -1,5 +1,7 @@
 # Film mode
 
+**Codex:** apply `codex.md` for tool names, question schemas, media previews, approval continuity and session handoff. Claude-specific examples below are mapped through that adapter.
+
 The six steps with a gate at each, research, per-shot revisions and a layered sound design. Read with `SKILL.md` (first questions, routes, hard rules) and the purpose file.
 
 ## 1. Context and revision protocol (mandatory)

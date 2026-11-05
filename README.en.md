@@ -9,6 +9,7 @@
 
 <p align="center">
   <a href="README.md">Türkçe</a> ·
+  <a href="README.es.md">Español</a> ·
   <a href="README.zh-CN.md">简体中文</a> ·
   <a href="README.ja.md">日本語</a> ·
   <a href="#install">Install</a> ·
@@ -17,9 +18,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/sarpstar/cinecode/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/sarpstar/cinecode/tests.yml?branch=main&label=tests&style=flat-square" alt="tests"></a>
   <img src="https://img.shields.io/badge/license-MIT-C37232?style=flat-square" alt="license: MIT">
-  <img src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Cursor-1a1a1a?style=flat-square" alt="agents: Claude Code, Cursor">
+  <img src="https://img.shields.io/badge/agent-Codex-1a1a1a?style=flat-square" alt="agent: Codex">
   <img src="https://img.shields.io/badge/render-three.js%20%C2%B7%20ffmpeg-1a1a1a?style=flat-square" alt="render: three.js, ffmpeg">
 </p>
 
@@ -28,7 +28,9 @@
 </p>
 <p align="center"><sub>30 seconds from films made with cinecode. Every frame is rendered from code in headless Chrome.</sub></p>
 
-It runs inside **Claude Code** (desktop app, VS Code extension, terminal) or **Cursor**, on your own computer. No paid service is required; a narrator, only if you want one, uses your own Gemini key (it has a free tier), ElevenLabs, or a free Turkish voice.
+This fork runs natively in **Codex** on your computer; Claude Code is not required. Install the skill from [JuanjoSCu/cinecode](https://github.com/JuanjoSCu/cinecode), then ask Codex to use `$cinecode`. No paid voice service is required for rendering; optional narration can use your own Gemini key, ElevenLabs, or a free voice.
+
+> **Codex adaptation:** [JuanjoSC](https://github.com/JuanjoSCu) adapted the original [cinecode by Sarp Yıldız](https://github.com/sarpstar/cinecode). The original MIT [LICENSE](LICENSE) is preserved. See the [Spanish guide](README.es.md) for a short Windows walkthrough.
 
 ## What you can make
 
@@ -98,14 +100,14 @@ From a 15-second clip to films of ten minutes and more. Quick mode makes a film 
 ## How it works
 
 1. **You say the idea.** One sentence is enough; a full brief goes straight to work.
-2. **It asks a few questions** (the idea's readings, what the film is made of, length and format, the look, the sound and the music), each with a recommended answer marked ★.
+2. **It asks only for missing decisions** about the idea, medium, format, look or sound. It follows choices you already made or delegated.
 3. **It shows the plan** as text: the beats second by second and a director card you can change line by line. Then two scenes as stills, before the rest is built.
 4. **It renders a draft,** checks it (motion from the first frame, loudness, legibility, repeats), shows it to you, and an independent viewer watches it cold. Your notes change only what they touch.
 5. **The final:** full size, mastered to −14 LUFS, with the credits for your video description.
 
 ## Two modes
 
-The agent asks this first and recommends one for your goal.
+When the brief leaves the mode open, the agent recommends one for your goal.
 
 | | **Quick mode** | **Film mode** |
 |---|---|---|
@@ -149,8 +151,9 @@ Details: `references/purpose-cinematic.md`, `references/purpose-ad.md`, `referen
 
 ## Requirements
 
-- An AI coding agent that can run local tools: **Claude Code** (desktop app, VS Code extension or terminal) or **Cursor**. The regular chat at claude.ai cannot run tools on your computer; Claude Code can (ffmpeg, Chrome, the scripts).
-- Node.js 22+, Python 3.9+, ffmpeg and Google Chrome (or Chromium / Edge); the agent installs what is missing, with your OK. Nothing else, on Windows either: the kit runs in Claude Code's own PowerShell, with no bash; Git is used only to install and update the kit, never to render. If the kit's guard does not run in a Claude Code session, the film's setup says GUARD OFF (the tests run on Windows and Linux on every push, and on macOS before each change; a whole film made on Windows is not tried yet). The hooks need a recent Claude Code (the exec-form hooks and `onFailure`, 2.1.295 or newer); on an older client the guard may not register and the film still runs.
+- **Codex** with local tool access, Node.js 22+, Python 3.9+, ffmpeg, and Google Chrome (or Chromium / Edge). On Windows, use PowerShell; where `python3` is unavailable, use `python` or `py -3`. A GPU available to Chrome is recommended. A full creative film pipeline on Windows has not yet been verified end to end.
+- Windows validation completed with Python 3.11 and Node 24: native Chrome captured 192 deterministic frames for an 8-second 360×640 H.264/AAC sample.
+- The original Claude-only session/transcript guard hooks are **not installed or active in Codex**. The film checks in `tools/make.py` and `tools/qc.py` remain available. The Python guard utilities are retained as legacy material.
 - A GPU that Chrome can use (any recent Mac, or a PC with a working graphics driver).
 - Disk space: Quick mode pipes frames straight into the MP4, so a few hundred MB is enough; Film mode needs a few GB per film while rendering.
 
@@ -163,19 +166,21 @@ Missing one of them? Just start: the agent checks the machine first and offers t
 
 ## Install
 
-Open Claude Code (the desktop app's **Code** tab, the VS Code extension or the terminal) and say:
+In Codex, ask: **"Install the cinecode skill from https://github.com/JuanjoSCu/cinecode into my Codex skills folder."** The default folder is `~/.codex/skills/cinecode` (or `$CODEX_HOME/skills/cinecode` when `CODEX_HOME` is set). Use it on your next turn; if the skill does not appear yet, open a new Codex chat.
 
-> Install the cinecode skill from https://github.com/sarpstar/cinecode
+Manual install in Windows PowerShell:
 
-It fetches the kit from GitHub with git into `~/.claude/skills/cinecode` (Windows: `%USERPROFILE%\.claude\skills\cinecode`); on a Windows computer without git it installs git first (`winget install --id Git.Git -e`), after your OK. Then open a new chat. Later, **"update cinecode"** brings the newest version. Install it in one place only, so the agent does not see two copies.
-
-By hand, the same in one line:
-
-```bash
-git clone https://github.com/sarpstar/cinecode.git ~/.claude/skills/cinecode
+```powershell
+$skills = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $HOME '.codex/skills' }
+New-Item -ItemType Directory -Force -Path $skills | Out-Null
+git clone https://github.com/JuanjoSCu/cinecode.git (Join-Path $skills 'cinecode')
 ```
 
-The skill starts on everyday film, animation and ad phrases ("kısa film", "animasyon", "reklam filmi", "ürün videosu", "tanıtım videosu", "make a short film", "product video", "ad").
+On macOS/Linux: `git clone https://github.com/JuanjoSCu/cinecode.git ~/.codex/skills/cinecode` (create `~/.codex/skills` first). To update a git installation, run `git -C <skill-folder> pull --ff-only`. Keep only one installed copy.
+
+The skill can be invoked as `$cinecode`, or with an ordinary request such as "make a short film". Open a **separate, empty film project folder**; film outputs belong there, never inside the skill repository. Codex reads the kit's `SKILL.md` and asks only for decisions the brief leaves open.
+
+### Other agents (legacy instructions)
 
 ### 1. Claude desktop app (Code)
 
@@ -249,7 +254,7 @@ Notes are applied only to the shots, lines or sound layers they touch; each roun
 
 **Built-in rules (both modes):** the first 2 seconds move from frame 1 (measured); every frame is a pure function of time (re-renders are identical); every outside file gets a licence row when it is downloaded; long renders run in the background with a status file; the agent looks at small contact sheets instead of full-size frames, which keeps cost down.
 
-**Who does the work (Film mode):** the main chat builds what it already holds the context for; a fresh helper agent, briefed from the project files with its model named, takes an independent part that runs in parallel (sound, narration takes, research, the independent viewer) or a chapter of a long film; your notes are saved verbatim in `notes/round-N.md` and only the shots they touch are worked on; a defect is diagnosed on a few test frames before anything is rebuilt. At checkpoints the agent may offer a new chat: in the Claude desktop app it opens by itself after your yes; elsewhere you open one and paste a single line, **"Continue from STATE.md"** (Turkish: **"STATE.md'den devam et"**). Details: `references/context-protocol.md`. Every step of a chat re-reads the whole chat, so a short chat is what keeps a film cheap: each helper starts on the model its task needs (taste and judgement on your chat's model, file work and sourcing on lighter ones), the renders answer in four lines (`tools/make.py`), and images stay small. In Claude Code the skill enforces this with three hooks that start the kit's guard; among its checks: a reminder when the chat grows large, no large images in the chat, a 25-step limit per helper, nothing asked about that the user has not seen, the key file kept closed.
+**Who does the work (Film mode):** the main chat builds what it already holds the context for; a fresh helper agent, briefed from the project files, may take an independent part that runs in parallel (sound, narration takes, research, the independent viewer) or a chapter of a long film. Your notes are saved verbatim in `notes/round-N.md`; a defect is diagnosed on a few test frames before anything is rebuilt. Codex continues in the current chat unless you request or accept a new one; the film can resume from `STATE.md`. Details: `references/context-protocol.md`. The original Claude Code integration could open a new desktop chat after your approval and enforced session rules with three hooks. Those automatic handoff and guard hooks are not active in Codex.
 
 ## What is inside
 
@@ -273,12 +278,12 @@ cinecode/
 │   ├── direction.py      the style board; with styles.py, asset_search.py, fonts.py
 │   ├── mix.py            the mix; master_audio.py (−14 LUFS), tts.py (narrator), beat_grid.py
 │   ├── qc.py             quality checks; with scene_check.py, words_check.py
-│   └── guard.py          the guard: enforces the rules on the spot (with hook.cjs, Claude Code)
+│   └── guard.py          legacy Claude Code guard (not active in Codex)
 ├── templates/            a new film's files and the Quick mode starter page
 ├── starter/              the three.js scene: eight looks, named camera moves, a type layer
 ├── styles/               58 style recipes (51 from lemo-opuscar, MIT; 7 the kit's own)
 ├── docs/                 README images and the font library
-└── tests/                the test suite, run on Windows and Linux on every push
+└── tests/                the test suite
 ```
 
 A film folder the kit sets up:
@@ -323,7 +328,7 @@ my-film/
 
 **I liked a film. Can the next one have the same format?** Yes. Say "save the format" ("formatı kaydet") after the final; next time say "same format" ("aynı formatta"). The look, type, sound, camera style and rhythm are kept, only the idea is asked, and the scenes and words are made new for it. Formats stay on your computer (`~/.cinecode/formats`).
 
-**How many tokens does a film use, and how do I see it?** A film is a long chat in which the agent writes code, renders and checks: a 30–60 second Quick film usually takes 100–250 steps. Every step re-reads the whole chat; most of that comes from the cache and is cheap, but each step grows as the chat does. So when a step is done and the chat has grown, the kit offers to continue in a new chat; nothing is lost, because the film lives in its files. `python3 tools/usage.py` in the film folder shows each chat's tokens (Claude Code). Every chat also starts with the short description of every installed skill and the tool definitions of every connected plugin and connector (a skill's full instructions load only when it is used); turning off the ones a film does not need makes every step cheaper.
+**How do I see usage?** Codex shows its own usage when available. The film lives in its project files, so Codex can continue in the same chat after context compaction. `tools/usage.py` reads Claude Code logs only; it is not a Codex token or cost meter.
 
 **Which languages?** The agent replies in your language. Subtitles are off unless you ask (at most two languages, stacked).
 
@@ -331,11 +336,11 @@ my-film/
 
 ## Tests
 
-From the kit folder run `python3 -m unittest discover -s tests`; put `CINECODE_BROWSER_TESTS=1` in front for the real Chrome and ffmpeg tests. The suite also runs on every push on Windows (with and without Git and bash) and on Ubuntu. If something goes wrong, report it on GitHub.
+From the kit folder run `python3 -X utf8 -m unittest discover -s tests` (Windows: `python -X utf8` or `py -3 -X utf8`). To enable Chrome and ffmpeg tests in PowerShell, set `$env:CINECODE_BROWSER_TESTS='1'` before running the suite. The `tools/make.py` and `tools/qc.py` mentioned above are copied into each new film project by `scripts/init_film.py`.
 
 ## Credits
 
-Made by Sarp Yıldız ([@sarpstar](https://github.com/sarpstar)) together with Claude, in Claude Code and Cursor. MIT licence, see [LICENSE](LICENSE).
+Original cinecode by Sarp Yıldız ([@sarpstar](https://github.com/sarpstar)), made together with Claude in Claude Code and Cursor. Codex adaptation by JuanjoSC ([@JuanjoSCu](https://github.com/JuanjoSCu)). The original MIT licence is preserved; see [LICENSE](LICENSE).
 Built on [three.js](https://github.com/mrdoob/three.js) (MIT) and [pmndrs/postprocessing](https://github.com/pmndrs/postprocessing) (Zlib), loaded at render time, not bundled.
 Some ideas inspired by [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) (MIT).
 The character kit (`references/characters.md`) is inspired by John Heibel's [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase); the cliché and colour checks are inspired by a study of the films in [yihui-dev/awesome-opus5-5-videos](https://github.com/yihui-dev/awesome-opus5-5-videos). Ideas only: no code, prompts or frames from either are included.
@@ -346,4 +351,4 @@ Motion principles (`references/motion.md`) draw on ideas from [LottieFiles/motio
 The recorded instruments are CC0: the [Versilian Community Sample Library](https://github.com/sgossner/VCSL) and the [Versilian Studios Chamber Orchestra 2 Community Edition](https://github.com/sgossner/VSCO-2-CE), fetched in small pieces only when a film uses them.
 The ready sound effects are [Kenney](https://kenney.nl)'s audio packs (CC0), downloaded once when a film first needs them.
 Free Turkish voices recommended under Requirements: EMA Lightning (Canberk Aslan), VoxCPM2 Türkçe ses tasarımı (alexturkey) and Ahenk (Özgür Güler); thanks to their authors.
-Repository: [github.com/sarpstar/cinecode](https://github.com/sarpstar/cinecode)
+Codex fork: [github.com/JuanjoSCu/cinecode](https://github.com/JuanjoSCu/cinecode) · Original: [github.com/sarpstar/cinecode](https://github.com/sarpstar/cinecode)

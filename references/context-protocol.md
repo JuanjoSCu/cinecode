@@ -1,5 +1,7 @@
 # Context and revision protocol (binding)
 
+In Codex, read `codex.md` first for host tools, helper models, approval continuity and chat handoff. Claude hooks and Claude usage measurements are not active in this fork.
+
 Every message in a chat re-reads the whole chat. A short main chat and fresh helper agents briefed from files keep each step small, fast and cheap, however many rounds the film takes. These rules apply to **Film mode**, from the first message to the last note round, in every profile. Quick mode is the fast lane: its main chat builds, renders and revises itself, research runs in the background, and only the prediction test, the overlap check, the narration takes and the independent viewer of each draft go to helpers, briefed in the format of §1 (`quick-mode.md` §6).
 
 ## 1. Thin coordinator
@@ -65,12 +67,17 @@ The new chat reads `STATE.md` ("Resume here" first), then only the files it name
 
 ## 5. Models
 
-Every helper starts with its **model named**, as `brief.py` prints it ("start it with: model …, effort …"): the work where taste and judgement decide (picture, script, roadmap, sound design, music, the independent viewer, revisions) on the chat's own model (`inherit`); rendering narration takes and sourcing on `sonnet`; moving and listing files on `haiku`. Counting, validating and measuring are scripts (`make.py`, `qc.py`, `validate_shots.py`), never a helper. A helper started without a model runs on the chat's model, the most costly; the guard notes it. A user may name other models; `STATE.md` records them.
-
-- **Cursor:** a Task/subagent call without a model runs on the chat's model; custom subagents in `.cursor/agents/*.md` may set `model:`.
-- **Claude Code:** the Agent tool runs on the session's model unless `model` is passed; agent files may set `model:` (`inherit` keeps the session's). A new session (or `/clear`) for the handoff.
+Use the host's available subagent tool and check that suggested models are available.
+`brief.py` recommends GPT-6 Luna (low effort) for bounded routine tasks and GPT-6 Sol
+(medium effort) for sourcing. Creative judgement uses the coordinator's model
+(`inherit` means omit the override); complex tasks may use Sol and high uncertainty
+may justify Astra. User-specified models take precedence. Never assume a model is
+most expensive merely because it is inherited. Use scripts for counting,
+validating and measuring. See `codex.md` for task ownership and fresh-context calls.
 
 ## 6. Budget meter
+
+The figures and `usage.py` measurements below are legacy Claude measurements, not Codex prices or budgets. In Codex use actual host usage when available; otherwise report measured elapsed time without inventing token totals or cost. Existing authorization takes precedence over repeated budget gates.
 
 `STATE.md` keeps the **profile's ceiling in words** (Economy / Balanced / Quality) and an **estimated running cost per phase**. The coordinator updates it at every gate from the helpers' replies.
 

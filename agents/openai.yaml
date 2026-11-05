@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cinecode"
+  short_description: "Crea vídeos con código, sonido y entrega en MP4"
+  default_prompt: "Usa $cinecode para crear un vídeo con código a partir de mi idea."

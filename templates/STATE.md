@@ -1,6 +1,6 @@
 # State: <working title>
 
-Read this first in every new session, after loading the <skill name> skill (Claude Code: the Skill tool, never a plain read of SKILL.md), then `python3 KIT/scripts/init_film.py . --update-tools` silently; update "Now" before ending every turn. Keep it short.
+Read this first in every new session, after loading the <skill name> skill (Codex: read `<kit path>/SKILL.md` and its Codex integration reference), then `python3 KIT/scripts/init_film.py . --update-tools` silently; update "Now" before ending every turn. Keep it short.
 Kit: <kit path>
 Method: this chat coordinates and builds what it holds the context for; a fresh helper takes only an independent part beside it (sound, narration takes, research, the independent viewer) or a long film's chapter, briefed from files (`<kit path>/references/context-protocol.md`).
 

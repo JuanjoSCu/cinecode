@@ -9,6 +9,7 @@
 
 <p align="center">
   <a href="README.en.md">English</a> ·
+  <a href="README.es.md">Español</a> ·
   <a href="README.zh-CN.md">简体中文</a> ·
   <a href="README.ja.md">日本語</a> ·
   <a href="#kurulum">Kurulum</a> ·
@@ -17,9 +18,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/sarpstar/cinecode/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/sarpstar/cinecode/tests.yml?branch=main&label=tests&style=flat-square" alt="tests"></a>
   <img src="https://img.shields.io/badge/license-MIT-C37232?style=flat-square" alt="license: MIT">
-  <img src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Cursor-1a1a1a?style=flat-square" alt="agents: Claude Code, Cursor">
+  <img src="https://img.shields.io/badge/agent-Codex-1a1a1a?style=flat-square" alt="agent: Codex">
   <img src="https://img.shields.io/badge/render-three.js%20%C2%B7%20ffmpeg-1a1a1a?style=flat-square" alt="render: three.js, ffmpeg">
 </p>
 
@@ -28,7 +28,9 @@
 </p>
 <p align="center"><sub>cinecode ile yapılmış filmlerden 30 saniye. Her kare başsız Chrome'da koddan üretildi.</sub></p>
 
-Kendi bilgisayarında, **Claude Code** (masaüstü uygulaması, VS Code eklentisi, terminal) ya da **Cursor** içinde çalışır. Ücretli bir servis gerekmez; dış ses, yalnızca istersen, kendi Gemini anahtarını (ücretsiz kotası var), ElevenLabs'i ya da ücretsiz bir Türkçe sesi kullanır.
+Bu uyarlama kendi bilgisayarında **Codex** içinde çalışır; Claude Code gerekli değildir. [JuanjoSCu/cinecode](https://github.com/JuanjoSCu/cinecode) deposundan kur, sonra Codex'e `$cinecode` ile seslen. Film renderı için ücretli ses servisi gerekmez; isteğe bağlı dış ses kendi Gemini anahtarını, ElevenLabs'i ya da ücretsiz bir sesi kullanabilir.
+
+> **Codex uyarlaması:** [JuanjoSC](https://github.com/JuanjoSCu), [Sarp Yıldız'ın özgün cinecode projesini](https://github.com/sarpstar/cinecode) uyarladı. Özgün MIT [LICENSE](LICENSE) korunur. Kısa Windows anlatımı için [İspanyolca kılavuza](README.es.md) bak.
 
 ## Neler yapabilirsin
 
@@ -98,14 +100,14 @@ On dakikayı aşan belgeseller, açıklayıcılar ve video denemeleri; Film modu
 ## Nasıl çalışır
 
 1. **Fikri söylersin.** Bir cümle yeter; eksiksiz bir brief doğrudan işe koyulur.
-2. **Birkaç soru sorar** (fikrin okumaları, filmin neyden yapılacağı, süre ve format, görünüm, ses ve müzik); her birinde önerilen cevap ★ ile işaretli.
+2. **Yalnızca açık kalan kararları sorar** (fikir, biçim, süre, görünüm veya ses). Önceden verdiğin ya da ajana bıraktığın kararları yeniden sormaz.
 3. **Planı gösterir:** saniye saniye vuruşlar ve satır satır değiştirebileceğin bir yönetmen kartı. Sonra gerisi kurulmadan önce iki sahne, kare olarak.
 4. **Taslağı render eder,** denetler (ilk kareden hareket, ses yüksekliği, okunurluk, tekrarlar), sana gösterir; bağımsız bir izleyici de onu soğuk gözle izler. Notların yalnızca dokundukları yeri değiştirir.
 5. **Final:** tam boyut, −14 LUFS mastering ve video açıklaman için künye.
 
 ## İki mod
 
-Ajan önce bunu sorar ve hedefine göre birini önerir.
+Mod belirtilmemişse ajan hedefine göre birini önerir.
 
 | | **Hızlı mod** | **Film modu** |
 |---|---|---|
@@ -149,8 +151,9 @@ Ayrıntılar: `references/purpose-cinematic.md`, `references/purpose-ad.md`, `re
 
 ## Gereksinimler
 
-- Bilgisayarında araç çalıştırabilen bir yapay zekâ kodlama ajanı: **Claude Code** (masaüstü uygulaması, VS Code eklentisi ya da terminal) ya da **Cursor**. claude.ai'deki normal sohbet bilgisayarında araç çalıştıramaz; Claude Code çalıştırır (ffmpeg, Chrome, betikler).
-- Node.js 22+, Python 3.9+, ffmpeg ve Google Chrome (ya da Chromium / Edge); eksik olanı ajan senin onayınla kurar. Başka bir şey gerekmez, Windows'ta da: kit Claude Code'un kendi PowerShell'inde çalışır, bash istemez; Git yalnızca kiti kurmak ve güncellemek için kullanılır, film üretiminde değil. Kitin bekçisi bir Claude Code oturumunda çalışmıyorsa filmin kurulumu GUARD OFF der (testler her gönderimde Windows ve Linux'ta, her değişiklikten önce macOS'ta çalışır; Windows'ta baştan sona bir film henüz denenmedi). Kancalar güncel bir Claude Code ister (exec biçimli kancalar ve `onFailure`, 2.1.295 ve sonrası); daha eski bir sürümde bekçi devreye girmeyebilir, film yine çalışır.
+- Yerel araçları çalıştırabilen **Codex**, Node.js 22+, Python 3.9+, ffmpeg ve Google Chrome (ya da Chromium / Edge). Windows'ta PowerShell kullan; `python3` yoksa `python` veya `py -3` kullan. Chrome'un erişebildiği bir GPU önerilir. Windows'ta yaratıcı film akışının tamamı henüz baştan sona doğrulanmadı.
+- Windows'ta Python 3.11 ve Node 24 ile yapılan doğrulamada yerel Chrome, 8 saniyelik 360×640 H.264/AAC örneği için 192 deterministik kare yakaladı.
+- Özgün Claude oturum/döküm bekçi kancaları Codex'te **kurulu veya etkin değildir**. `tools/make.py` ve `tools/qc.py` kontrolleri kullanılabilir. Python bekçi araçları eski entegrasyon için korunur.
 - Chrome'un kullanabildiği bir GPU (güncel her Mac ya da sürücüsü çalışan bir PC).
 - Disk alanı: Hızlı mod kareleri doğrudan MP4'e aktardığı için birkaç yüz MB yeterli; Film modu render sırasında film başına birkaç GB ister.
 
@@ -163,19 +166,21 @@ Biri eksik mi? Yine de başla: ajan önce bilgisayarı kontrol eder ve eksik ola
 
 ## Kurulum
 
-Claude Code'u aç (masaüstü uygulamasında **Code** sekmesi, VS Code eklentisi ya da terminal) ve şunu yaz:
+Codex'e şunu söyle: **"https://github.com/JuanjoSCu/cinecode deposundaki cinecode becerisini Codex beceri klasörüme kur."** Varsayılan klasör `~/.codex/skills/cinecode`; `CODEX_HOME` ayarlıysa `$CODEX_HOME/skills/cinecode`. Sonraki isteğinde kullan; beceri henüz görünmüyorsa yeni bir Codex sohbeti aç.
 
-> cinecode skill'ini https://github.com/sarpstar/cinecode adresinden kur
+Windows PowerShell'de elle kurulum:
 
-Kiti GitHub'dan git ile `~/.claude/skills/cinecode` klasörüne çeker (Windows: `%USERPROFILE%\.claude\skills\cinecode`); git'i olmayan bir Windows bilgisayarda önce senin onayınla git'i kurar (`winget install --id Git.Git -e`). Sonra yeni bir sohbet aç. Daha sonra **"cinecode'u güncelle"** demen en yeni sürümü getirir. Yalnızca tek bir yere kur; ajan iki kopya görmesin.
-
-Elle, tek satırda aynısı:
-
-```bash
-git clone https://github.com/sarpstar/cinecode.git ~/.claude/skills/cinecode
+```powershell
+$skills = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $HOME '.codex/skills' }
+New-Item -ItemType Directory -Force -Path $skills | Out-Null
+git clone https://github.com/JuanjoSCu/cinecode.git (Join-Path $skills 'cinecode')
 ```
 
-Beceri gündelik film, animasyon ve reklam cümleleriyle başlar ("kısa film", "animasyon", "reklam filmi", "ürün videosu", "tanıtım videosu", "make a short film", "product video", "ad").
+macOS/Linux: önce `~/.codex/skills` klasörünü oluştur, ardından `git clone https://github.com/JuanjoSCu/cinecode.git ~/.codex/skills/cinecode` çalıştır. Git kurulumunu güncellemek için `git -C <beceri-klasörü> pull --ff-only` kullan. Yalnızca tek kopya kur.
+
+Beceri `$cinecode` ile veya "kısa film yapmak istiyorum" gibi bir istekle başlar. **Ayrı, boş bir film proje klasörü** aç; film çıktıları beceri deposunun içine yazılmaz. Codex `SKILL.md` dosyasını okur ve yalnızca brifte açık kalan kararları sorar.
+
+### Diğer ajanlar (eski yönergeler)
 
 ### 1. Claude masaüstü uygulaması (Code)
 
@@ -249,7 +254,7 @@ Notlar yalnızca dokundukları planlara, repliklere ya da ses katmanlarına uygu
 
 **Yerleşik kurallar (iki modda da):** ilk 2 saniye ilk kareden itibaren hareketlidir (ölçülür); her kare zamanın saf bir fonksiyonudur (yeniden render birebir aynıdır); dışarıdan gelen her dosya indirildiği anda lisans satırı alır; uzun renderlar durum dosyasıyla arka planda çalışır; ajan tam boy kareler yerine küçük temas sayfalarına bakar, bu da maliyeti düşük tutar.
 
-**İşi kim yapar (Film modu):** ana sohbet, bağlamı elinde olan işi kendisi kurar; proje dosyalarından brif alan ve modeli belirtilen yeni bir yardımcı ajan, paralel yürüyebilen bağımsız bir parçayı (ses, dış ses denemeleri, araştırma, bağımsız izleyici) ya da uzun bir filmin bir bölümünü üstlenir; notların `notes/round-N.md` dosyasına aynen kaydedilir ve yalnızca dokundukları planlar ele alınır; bir hata, bir şey yeniden yapılmadan önce birkaç test karesiyle teşhis edilir. Kontrol noktalarında ajan yeni bir sohbet önerebilir: Claude masaüstü uygulamasında senin onayınla kendiliğinden açılır; başka yerlerde yeni bir sohbet açıp tek satır yapıştırırsın: **"STATE.md'den devam et"** (İngilizce: **"Continue from STATE.md"**). Ayrıntılar: `references/context-protocol.md`. Sohbetteki her adım bütün sohbeti yeniden okur; bir filmi ucuz tutan şey kısa sohbettir: her yardımcı işinin gerektirdiği modelde başlar (zevk ve yargı gerektiren iş senin sohbetinin modelinde, dosya işleri ve kaynak arama daha hafif modellerde), renderlar dört satırla cevap verir (`tools/make.py`), görseller küçük kalır. Claude Code'da skill bunu kitin bekçisini başlatan üç kancayla uygular; denetimlerinden bazıları: sohbet büyüyünce hatırlatma, sohbete büyük görsel girmemesi, yardımcı başına 25 adım sınırı, kullanıcının görmediği bir şeyin sorulmaması, anahtar dosyasının kapalı kalması.
+**İşi kim yapar (Film modu):** ana sohbet, bağlamı elinde olan işi kendisi kurar; bağımsız bir parça (ses, dış ses denemeleri, araştırma, bağımsız izleyici) ya da uzun filmin bir bölümü için gerektiğinde yardımcı ajan kullanır. Notların `notes/round-N.md` dosyasına aynen kaydedilir; bir hata, yeniden yapmadan önce birkaç test karesiyle teşhis edilir. Codex, sen yeni bir sohbet istemedikçe veya bunu kabul etmedikçe mevcut sohbette devam eder; filmin durumu `STATE.md` dosyasından okunur. Ayrıntılar: `references/context-protocol.md`. Özgün Claude Code entegrasyonu, onayından sonra masaüstünde yeni sohbet açabiliyor ve oturum kurallarını üç kancayla denetliyordu. Bu otomatik devir ve bekçi kancaları Codex'te etkin değildir.
 
 ## İçinde ne var
 
@@ -273,12 +278,12 @@ cinecode/
 │   ├── direction.py      stil panosu; styles.py, asset_search.py, fonts.py ile
 │   ├── mix.py            miks; master_audio.py (−14 LUFS), tts.py (anlatıcı), beat_grid.py
 │   ├── qc.py             kalite kontrolleri; scene_check.py, words_check.py ile
-│   └── guard.py          bekçi: kuralları anında uygular (hook.cjs ile, Claude Code)
+│   └── guard.py          eski Claude Code bekçisi (Codex'te etkin değil)
 ├── templates/            yeni bir filmin dosyaları ve Hızlı mod başlangıç sayfası
 ├── starter/              three.js sahnesi: sekiz görünüm, adlandırılmış kamera hareketleri, yazı katmanı
 ├── styles/               58 stil tarifi (51'i lemo-opuscar, MIT; 7'si kitin kendi)
 ├── docs/                 README görselleri ve font kütüphanesi
-└── tests/                her gönderimde Windows ve Linux'ta çalışan test takımı
+└── tests/                test takımı
 ```
 
 Kitin kurduğu bir film klasörü:
@@ -323,7 +328,7 @@ filmim/
 
 **Bir filmi beğendim, sonraki aynı formatta olabilir mi?** Evet. Finalden sonra "formatı kaydet" de; sonraki seferde "aynı formatta" de. Görünüm, font, ses, kamera dili ve ritim korunur, yalnızca fikir sorulur; sahneler ve sözler yeni fikre göre baştan yapılır. Formatlar senin bilgisayarında kalır (`~/.cinecode/formats`).
 
-**Ne kadar token harcar, nasıl görürüm?** Bir film, ajanın kod yazıp render edip kontrol ettiği uzun bir sohbettir: Hızlı modda 30–60 saniyelik bir film genellikle 100–250 adım sürer. Her adım bütün sohbeti yeniden okur; bunun çoğu önbellekten gelir ve ucuzdur, ama sohbet uzadıkça her adım büyür. Bu yüzden kit, bir aşama bitip sohbet büyüdüğünde yeni bir sohbette devam etmeyi önerir; film dosyalarında yaşadığı için hiçbir şey kaybolmaz. Film klasöründe `python3 tools/usage.py` her sohbetin token dökümünü gösterir (Claude Code). Her sohbet ayrıca kurulu her skill'in kısa açıklamasıyla ve bağlı her eklenti ile bağlayıcının araç tanımlarıyla başlar (bir skill'in tam talimatları yalnızca kullanıldığında yüklenir); filmin ihtiyaç duymadıklarını kapatmak her adımı ucuzlatır.
+**Kullanımı nasıl görürüm?** Codex, mevcut olduğunda kendi kullanım bilgisini gösterir. Film dosyalarında yaşadığı için bağlam daraltılsa da Codex aynı sohbette devam edebilir. `tools/usage.py` yalnızca Claude Code günlüklerini okur; Codex token veya maliyet ölçeri değildir.
 
 **Hangi diller?** Ajan senin dilinde yanıt verir. Altyazı sen istemezsen kapalıdır (en fazla iki dil, alt alta).
 
@@ -331,11 +336,11 @@ filmim/
 
 ## Testler
 
-Kit klasöründe `python3 -m unittest discover -s tests` çalıştır; gerçek Chrome ve ffmpeg testleri için başına `CINECODE_BROWSER_TESTS=1` ekle. Test takımı her gönderimde Windows'ta (Git ve bash ile de, onlarsız da) ve Ubuntu'da da çalışır. Bir sorun görürsen GitHub'da bildir.
+Kit klasöründe `python3 -X utf8 -m unittest discover -s tests` çalıştır (Windows: `python -X utf8` veya `py -3 -X utf8`). PowerShell'de gerçek Chrome ve ffmpeg testleri için önce `$env:CINECODE_BROWSER_TESTS='1'` ayarla. Yukarıda geçen `tools/make.py` ve `tools/qc.py`, `scripts/init_film.py` tarafından her yeni film projesine kopyalanır.
 
 ## Emeği geçenler
 
-Sarp Yıldız ([@sarpstar](https://github.com/sarpstar)) tarafından, Claude ile birlikte Claude Code ve Cursor içinde yapıldı. MIT lisansı, bkz. [LICENSE](LICENSE).
+Özgün cinecode, Sarp Yıldız ([@sarpstar](https://github.com/sarpstar)) tarafından Claude ile birlikte Claude Code ve Cursor içinde yapıldı. Codex uyarlaması JuanjoSC ([@JuanjoSCu](https://github.com/JuanjoSCu)) tarafından yapıldı. Özgün MIT lisansı korunur; bkz. [LICENSE](LICENSE).
 [three.js](https://github.com/mrdoob/three.js) (MIT) ve [pmndrs/postprocessing](https://github.com/pmndrs/postprocessing) (Zlib) üzerine kuruludur; render sırasında yüklenir, pakete dahil edilmez.
 Bazı fikirler [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) (MIT) projesinden ilham aldı.
 Karakter kiti (`references/characters.md`) John Heibel'in [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) projesinden, klişe ve renk kontrolleri [yihui-dev/awesome-opus5-5-videos](https://github.com/yihui-dev/awesome-opus5-5-videos) koleksiyonundaki filmlerin incelenmesinden ilham aldı. Yalnızca fikir: ikisinden de kod, prompt ya da kare alınmadı.
@@ -347,4 +352,4 @@ Hareket ilkeleri (`references/motion.md`) [LottieFiles/motion-design-skill](http
 Kayıtlı enstrümanlar CC0'dır: [Versilian Community Sample Library](https://github.com/sgossner/VCSL) ve [Versilian Studios Chamber Orchestra 2 Community Edition](https://github.com/sgossner/VSCO-2-CE); yalnızca bir film kullandığında küçük parçalar halinde indirilir.
 Hazır ses efektleri [Kenney](https://kenney.nl)'nin ses paketleridir (CC0); bir film ilk ihtiyaç duyduğunda bir kez indirilir.
 Gereksinimler bölümünde önerilen bedava Türkçe sesler: EMA Lightning (Canberk Aslan), VoxCPM2 Türkçe ses tasarımı (alexturkey) ve Ahenk (Özgür Güler); yapanlarına teşekkürler.
-Depo: [github.com/sarpstar/cinecode](https://github.com/sarpstar/cinecode)
+Codex deposu: [github.com/JuanjoSCu/cinecode](https://github.com/JuanjoSCu/cinecode) · Özgün depo: [github.com/sarpstar/cinecode](https://github.com/sarpstar/cinecode)

@@ -1,5 +1,7 @@
 # Quick mode
 
+**Codex:** apply `codex.md` for tool names, question schemas, media previews, approval continuity and session handoff. Claude-specific examples below are mapped through that adapter. If the user delegates style or requests the final MP4, those choices are already authorized: choose an appropriate style, present progress and complete the final after validation without asking again. Ask only about essential missing material or identity (for example an unnamed product); do not invent brand facts. This takes precedence over the legacy mandatory style and final questions below.
+
 The whole film lives in one file, `film.html`: the timeline, every scene as a function of time, the words, and the soundtrack (Web Audio, rendered offline). The main chat does everything; `make.py` renders, checks and answers in a few lines. For a showcase with per-shot approval and layered sound, use Film mode (`film-mode.md`).
 
 The work runs on three habits: **a short, exact plan** (one card with seconds, colours and sizes), **your own eyes before anything long renders** (stills at the key moments, compared with the card), and **notes as numbers** (what changes, by how much).

@@ -10,8 +10,9 @@ exist for it, so the rules travel inside the brief.
   python3 tools/brief.py overlap --task "<the user's first message>"   # also writes research/past-films.md
   python3 tools/brief.py wait research/predict.md                     # a helper waits for a file another one writes
 
-Pass the whole output as the helper's prompt (Claude Code: the Agent tool; Cursor: Task). In a Film mode project the
-guard stops a helper started without one.
+Pass the whole output as the helper's prompt. In Codex, use a subagent only when the task is independent and
+delegation helps; check available models and honor a model named by the user. Claude Code's Film-mode guard stops a
+helper started without a brief.
 """
 import argparse
 import os
@@ -81,15 +82,15 @@ LAYERS = ("references/sound.md", "## 3. Layers", "")
 KINDS = {
     "sound": ("sound design, foley, mix", [SOUND_EVENTS, MASTER, LAYERS, ACCENTS], "inherit", ""),
     "music": ("the score or a found recording", [MUSIC, ACCENTS], "inherit", ""),
-    "voice": ("rendering narration takes (the user picks the voice)", [VOICE], "sonnet", "low"),
+    "voice": ("rendering narration takes (the user picks the voice)", [VOICE], "gpt-6-luna", "low"),
     "picture": ("building shots, the style frame", [PICTURE, STEP4, HALF, FINISH], "inherit", ""),
-    "sourcing": ("finding real material and stock, logging its licence", [SEARCH, LICLOG, NEVER, PICTURE, FACTS], "sonnet", "medium"),
-    "files": ("moving, renaming and listing files; licence rows from search results", [LICLOG], "haiku", "low"),
+    "sourcing": ("finding real material and stock, logging its licence", [SEARCH, LICLOG, NEVER, PICTURE, FACTS], "gpt-6-sol", "medium"),
+    "files": ("moving, renaming and listing files; licence rows from search results", [LICLOG], "gpt-6-luna", "low"),
     "script": ("the script and its lines", [STEP3, WRITER, WORDS, LONG, KEYS, COLD, FACTS], "inherit", ""),
     "roadmap": ("structure, the curiosity map, the beat table", [STEP2, SPECIFIC, LONG, SKELETON, KEYS, SOUND_ID], "inherit", ""),
     "review": ("the cold comprehension test or an independent look", [COLD, DRAFT], "inherit", ""),
-    "predict": ("the prediction test: the films the user's first message makes anyone expect, five lines, from that message alone", [PREDICT], "sonnet", "low"),
-    "overlap": ("the overlap check: each candidate idea against the expected films and this user's own films, judged by someone who did not write them", [OVERLAP], "sonnet", "low"),
+    "predict": ("the prediction test: the films the user's first message makes anyone expect, five lines, from that message alone", [PREDICT], "gpt-6-luna", "low"),
+    "overlap": ("the overlap check: each candidate idea against the expected films and this user's own films, judged by someone who did not write them", [OVERLAP], "gpt-6-luna", "low"),
     "revision": ("a notes round: fixes and re-plans", [NOTES, HALF, FINISH], "inherit", ""),
 }
 MARK = "<!-- cinecode brief: {} -->"
@@ -194,8 +195,9 @@ def main():
                   "The user's first message, quoted, so an overlap it asks for (a sequel, the same subject on purpose) "
                   "is known and counts as CLEAR: " + a.task)
     what, parts, model, effort = KINDS[a.kind]
-    print("start it with: model " + model + (f", effort {effort}" if effort else "") + " (Claude Code: the Agent "
-          "call's model and effort; inherit = the chat's own model)", file=sys.stderr)
+    print("start it with: model " + model + (f", effort {effort}" if effort else "") +
+          " (Codex: check availability and honor any user-selected model; inherit = the chat's own model)",
+          file=sys.stderr)
     body = [MARK.format(a.kind), f"# Task ({what})\n\n{a.task}\n", "# Files\n",
             (f"PROJECT: {film} (the film's folder; every path below is inside it)\n" if film else "") +
             f"WRITES: {a.writes}\nREADS: {a.reads}\nDO NOT TOUCH: {', '.join(SHARED)} (the main chat owns them) and every "

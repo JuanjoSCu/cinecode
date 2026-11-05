@@ -94,7 +94,7 @@ class Context(unittest.TestCase):
                 "files": ["## 3. The licence log"]}
         self.assertEqual(set(must), set(brief.KINDS))
         for kind, (_, parts, model, effort) in brief.KINDS.items():
-            self.assertIn(model, ("inherit", "sonnet", "haiku"), kind)
+            self.assertIn(model, ("inherit", "gpt-6-luna", "gpt-6-sol"), kind)
             text = "\n".join(brief.piece(*p) for p in parts)
             for heading in must[kind]:
                 self.assertIn(heading, text, f"{kind}: {heading}")
@@ -639,13 +639,13 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
         brief = subprocess.run([sys.executable, str(ROOT / "scripts" / "brief.py"), "sourcing", "--task", "find maps", "--writes", "assets/maps/*",
                                 "--reads", "STATE.md", "--done", "three maps with licences"],
                                capture_output=True, text=True)
-        self.assertIn("model sonnet, effort medium", brief.stderr)
-        self.assertNotIn("model sonnet", brief.stdout)
+        self.assertIn("model gpt-6-sol, effort medium", brief.stderr)
+        self.assertNotIn("model gpt-6-sol", brief.stdout)
         ev = {"tool_name": "Agent", "cwd": str(self.film), "session_id": "s", "tool_input": {"prompt": brief.stdout}}
         code, out = self.guard("tool", ev)
         self.assertEqual(code, 0)
         self.assertIn("without a model", json.loads(out)["hookSpecificOutput"]["additionalContext"])
-        named = dict(ev, tool_input={"prompt": brief.stdout, "model": "sonnet", "effort": "medium"})
+        named = dict(ev, tool_input={"prompt": brief.stdout, "model": "gpt-6-sol", "effort": "medium"})
         self.assertEqual(self.guard("tool", named), (0, ""))
 
     def test_a_helper_writes_only_its_own_files_and_the_viewer_only_looks(self):
@@ -1518,7 +1518,7 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
 
     def test_the_hooks_run_without_a_shell_and_find_a_python_or_stay_out_of_the_way(self):
         import re as _re
-        head = (ROOT / "SKILL.md").read_text(encoding="utf-8").split("\n---", 1)[0]
+        head = (ROOT / "tests" / "fixtures" / "claude-hooks.yaml").read_text(encoding="utf-8").split("\n---", 1)[0]
         self.assertNotIn("shell:", head, "no shell between Claude Code and the guard, so no bash is needed on Windows")
         self.assertEqual(head.count("command: node"), 3)
         finders = _re.findall(r'^\s+- "(.+)"$', head, _re.M)
@@ -3274,6 +3274,7 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
             self.assertIn("claude://code/new?folder=", run("claude-desktop", "--link"))
             self.assertIn("q=STATE.md%27den+devam+et", run("local-agent", "--link"))
             self.assertIn("new Terminal window", run("cli"))
+            self.assertIn("no chat was opened", run("cli"))
         self.assertIn("Continue from STATE.md", run("claude-vscode", "--lang", "en"))
 
     def test_a_throwaway_chat_folder_sends_films_home(self):
@@ -3286,7 +3287,7 @@ console.log(JSON.stringify({ ahead, farScale: far[2], nearScale: near[2], behind
         chat = self.root / "Claude" / "scratch-workspaces" / "x"
         chat.mkdir(parents=True)
         r = subprocess.run([sys.executable, str(ROOT / "scripts" / "init_film.py"), "road-trip", "--quick", "--films-folder",
-                            "Filmler"], cwd=chat, env=dict(self.env, HOME=str(home), USERPROFILE=str(home)),
+                            "Filmler"], cwd=chat, env=dict(self.env, HOME=str(home), USERPROFILE=str(home), CLAUDECODE="1"),
                            capture_output=True, text=True)
         self.assertTrue((home / "Filmler" / "road-trip" / "STATE.md").is_file(), r.stdout + r.stderr)
         self.assertIn("OUTSIDE THIS CHAT", r.stdout, "the chat moves into a film it cannot show files from")

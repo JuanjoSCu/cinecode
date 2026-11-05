@@ -1,6 +1,6 @@
 # State: <working title> (Quick mode)
 
-Read this first in a new session, after loading the <skill name> skill (Claude Code: the Skill tool, never a plain read of SKILL.md), then `python3 <kit path>/scripts/init_film.py . --update-tools` silently (the kit's newest tools). Kit: <kit path> · Method: `<kit path>/references/quick-mode.md`
+Read this first in a new session, after loading the <skill name> skill (Codex: read `<kit path>/SKILL.md` and its Codex integration reference), then `python3 <kit path>/scripts/init_film.py . --update-tools` silently (the kit's newest tools). Kit: <kit path> · Method: `<kit path>/references/quick-mode.md`
 
 - **Phase:** 1 Questions  <!-- 1 Questions · 1b Research (if chosen) · 2 The card (text gate) · 3 Two scenes as stills (gate) · 3b The rest · 4 Draft · 5 Revisions on drafts (max 2) · 6 Final render · delivered -->
 - **Format source:** <none · saved format name (FORMAT.md)>

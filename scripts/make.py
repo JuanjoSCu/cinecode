@@ -1440,7 +1440,7 @@ STARTED = time.time()
 def guard_off():
     """In a Claude Code session the guard leaves a trace for the session's folder each time it runs (guard.py); none
     for this folder or the folders above it in the last half hour means its hooks do not run here."""
-    if not os.environ.get("CLAUDECODE"):
+    if os.environ.get("CINECODE_HOST") == "codex" or not os.environ.get("CLAUDECODE"):
         return ""
     seen = Path(os.environ.get("CINECODE_GUARD_SEEN") or Path.home() / ".cinecode" / "guard-seen")
     d = os.path.realpath(os.getcwd())

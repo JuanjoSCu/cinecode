@@ -84,16 +84,14 @@ fonts/
 AGENTS = """# Film project
 
 This folder is a short film made with code. When the user asks about the film (or says "continue", "devam"),
-load the {skill} skill (in Claude Code through the Skill tool, which also starts its context guard; elsewhere read
-`{kit}/SKILL.md` once). State lives in `STATE.md`; read it first ("Resume here").
+read `{kit}/SKILL.md` and its Codex adapter. State lives in `STATE.md`; read it first ("Resume here").
 The main chat builds what it holds the context for and makes small revisions (up to five targeted edits) itself;
 independent parts and larger revisions go to fresh subagents briefed from files (`{kit}/references/context-protocol.md` §1).
 """
 AGENTS_QUICK = """# Film project (Quick mode)
 
 This folder is a short film made with code in one file, `film.html` (picture and sound). When the user asks about
-the film (or says "continue", "devam"), load the {skill} skill (in Claude Code through the Skill tool, which also
-starts its context guard; elsewhere read `{kit}/SKILL.md` once), read `STATE.md`, then follow
+the film (or says "continue", "devam"), read `{kit}/SKILL.md` and its Codex adapter, read `STATE.md`, then follow
 `{kit}/references/quick-mode.md`. Renders go through `tools/make.py`; the main chat builds and revises itself (quick-mode.md §6).
 """
 
@@ -209,6 +207,9 @@ def films_folder(cwd, name):
 def outside_chat(root, cwd):
     """The film opened outside the chat's own folder (the app's throwaway chat folder sends it home). The Claude app
     shows, plays and previews only files inside the chat's folders, so the chat moves into the film first."""
+    if os.environ.get("CINECODE_HOST") == "codex" or not (
+            os.environ.get("CLAUDECODE") or os.environ.get("CLAUDE_CODE_ENTRYPOINT")):
+        return ""  # Codex can reference the film's absolute files without a Claude session transfer.
     r, c = os.path.abspath(root), os.path.abspath(cwd)
     if r == c or r.startswith(c.rstrip("\\/") + os.sep):
         return ""
@@ -289,7 +290,7 @@ STARTED = time.time()
 def guard_off():
     """In a Claude Code session the guard leaves a trace for the session's folder each time it runs (guard.py); none
     for this folder or the folders above it in the last half hour means its hooks do not run here."""
-    if not os.environ.get("CLAUDECODE"):
+    if os.environ.get("CINECODE_HOST") == "codex" or not os.environ.get("CLAUDECODE"):
         return ""
     seen = Path(os.environ.get("CINECODE_GUARD_SEEN") or Path.home() / ".cinecode" / "guard-seen")
     d = os.path.realpath(os.getcwd())
@@ -314,6 +315,15 @@ def shown(path):
         return path
 
 
+def inside_kit(path):
+    """Whether a project path resolves to the kit or one of its descendants."""
+    try:
+        return os.path.commonpath((os.path.normcase(os.path.realpath(path)),
+                                   os.path.normcase(os.path.realpath(KIT)))) == os.path.normcase(os.path.realpath(KIT))
+    except ValueError:  # paths on different Windows drives
+        return False
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("dir")
@@ -336,8 +346,13 @@ def main():
     short = "/" not in a.dir and "\\" not in a.dir           # a short name on either platform, never a path
     dealt_here = os.path.isdir(root) and predealt(root)       # the spark deal made it, before the film was set up
     staged = root if short and dealt_here else None
-    if not (a.update_tools or a.shelve) and short and a.dir not in (".", "..") and (staged or not os.path.exists(root)):
+    routed = not (a.update_tools or a.shelve) and short and a.dir not in (".", "..") and (staged or not os.path.exists(root))
+    if routed:
         root = os.path.join(films_folder(os.getcwd(), a.films_folder), a.dir)
+    if inside_kit(root):
+        raise SystemExit(f"KIT FOLDER: {root} is inside the cinecode kit. Create the film in a separate project folder "
+                         f"outside {KIT}; pass that folder's absolute path to init_film.py.")
+    if routed:
         os.makedirs(os.path.dirname(root), exist_ok=True)
     if a.update_tools:
         return update_tools(root)

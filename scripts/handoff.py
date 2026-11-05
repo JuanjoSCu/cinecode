@@ -3,12 +3,14 @@
 
   python3 tools/handoff.py                 # the film folder is the current folder; the line in Turkish
   python3 tools/handoff.py --lang en       # "Continue from STATE.md"
-  python3 tools/handoff.py --dry-run       # print what it would open, open nothing
+  python3 tools/handoff.py --lang es       # "Continúa desde STATE.md"
+  python3 tools/handoff.py --dry-run       # print the handoff, open nothing
 
-Where the chat runs decides how (CLAUDE_CODE_ENTRYPOINT):
+In Codex, this prints the film folder and a ready-to-send line for a fresh chat; it does not create one.
+For legacy Claude sessions, CLAUDE_CODE_ENTRYPOINT decides how:
   Claude desktop app   opens nothing: the chat starts the child session itself with mcp__ccd_session__start_session,
                        which begins working at once (--link: claude://code/new, the line in its box, one Enter)
-  Claude Code terminal (macOS) a new Terminal window: cd <film> && claude "<line>"
+  Claude Code terminal (macOS) prints a command for a new Terminal window
   anything else        the line is copied to the clipboard; the reply tells the user to open a new chat in the film's
                        folder and paste it
 Prints one line saying which of these happened. Python 3 stdlib.
@@ -21,7 +23,7 @@ import subprocess
 import sys
 import urllib.parse
 
-LINES = {"tr": "STATE.md'den devam et", "en": "Continue from STATE.md"}
+LINES = {"tr": "STATE.md'den devam et", "en": "Continue from STATE.md", "es": "Continúa desde STATE.md"}
 
 
 def copy(text):
@@ -49,6 +51,12 @@ def main(argv=None):
     entry = os.environ.get("CLAUDE_CODE_ENTRYPOINT", "")
     mac = sys.platform == "darwin"
 
+    if os.environ.get("CINECODE_HOST") == "codex" or (not entry and not os.environ.get("CLAUDECODE")):
+        print(f"handoff: open a new Codex chat in {folder} and send \"{line}\". "
+              "Read AGENTS.md and the kit's SKILL.md, then STATE.md and its named notes. "
+              "No chat was opened here.")
+        return 0
+
     if ("desktop" in entry or entry in ("local-agent", "local_agent")) and not a.link:
         print("handoff: in the Claude desktop app start the new chat with mcp__ccd_session__start_session (initiation "
               f"user_asked, context fresh, cwd {folder}, a title, and a prompt that begins \"{line}.\" and says: load the "
@@ -58,21 +66,12 @@ def main(argv=None):
         return 0
     if mac and ("desktop" in entry or entry in ("local-agent", "local_agent")):
         url = "claude://code/new?" + urllib.parse.urlencode({"folder": folder, "q": line, "source": "cinecode"})
-        if a.dry_run:
-            print(f"would open {url}")
-            return 0
-        if subprocess.run(["open", url]).returncode == 0:
-            print(f"opened a new Claude Code session in {folder} with \"{line}\" (press Enter there if it waits)")
-            return 0
+        print(f"open {url} to start a fresh Claude Code session in {folder}; no chat was opened here")
+        return 0
     if mac and entry == "cli" and shutil.which("osascript"):
         cmd = f"cd {shlex.quote(folder)} && claude {shlex.quote(line)}"
-        script = f'tell application "Terminal" to do script "{cmd.replace(chr(92), chr(92) * 2).replace(chr(34), chr(92) + chr(34))}"'
-        if a.dry_run:
-            print(f"would run in a new Terminal window: {cmd}")
-            return 0
-        if subprocess.run(["osascript", "-e", script, "-e", 'tell application "Terminal" to activate']).returncode == 0:
-            print(f"opened a new Terminal window with a fresh chat in {folder}; it starts from STATE.md")
-            return 0
+        print(f"run in a new Terminal window: {cmd}; no chat was opened here")
+        return 0
     copied = not a.dry_run and copy(line)
     print(f"{'copied' if copied else 'line'}: \"{line}\". Open a new chat in {folder} and "
           f"{'paste it' if copied else 'type it'} (Cursor: a new Agent chat in that folder).")

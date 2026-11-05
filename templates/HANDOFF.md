@@ -1,32 +1,29 @@
 # Handoff
 
-<!--
-For the coordinator: hand off at every gate, after about 15 user messages, or when the context is large
-(references/context-protocol.md §4). Do the checklist, then send the message in the user's language.
--->
+## Before resuming
 
-## Before the message
-- [ ] `STATE.md` "Resume here" filled: phase, approved gates, open notes, next action, budget so far
-- [ ] Open notes saved verbatim in `notes/round-N.md`, split per shot
-- [ ] Running jobs recorded in `STATE.md` (command, status file, log)
-- [ ] Silent snapshot saved (`python3 tools/snapshot.py "handoff: <phase>"`; never mentioned to the user)
+- Update `STATE.md`: current phase, approved choices, open notes and next action.
+- Save user notes verbatim in `notes/round-N.md`.
+- Record running jobs with their command, status file and log.
+- Save the text snapshot with `python tools/snapshot.py "handoff"`.
 
-## Ask, one question (the question tool), in the user's language
+## Continue the work
 
-**Türkçe:** "Bu aşama kaydedildi. Sohbet büyüdü; yeni sohbette devam etmek daha hızlı ve ucuz."
-- ★ **Yeni sohbette devam et**: start the new chat so that it begins working by itself (below). Then say in one line what happened and stop here.
-- **Burada devam et**: go on in this chat.
+Continue in the current Codex chat unless the user explicitly asks for or accepts a
+new one. Context compaction is not a request for another chat. When a new chat is
+requested, use the available Codex chat tool with the film folder and this prompt,
+translated into the user's language:
 
-**English:** "This step is saved. The chat has grown; a new chat is faster and cheaper." ★ **Continue in a new chat** (`tools/handoff.py --lang en`) · **Continue here**.
+> Continue from STATE.md. Read the Cinecode SKILL.md referenced in AGENTS.md and its
+> Codex integration reference. Refresh copied tools with
+> `python KIT/scripts/init_film.py . --update-tools`. Read STATE.md and only the files
+> it names, preserve the approved choices, and carry out the next action.
 
-## Starting the new chat
-- **Claude desktop app:** `mcp__ccd_session__start_session` with `initiation: "user_asked"`, `context: "fresh"`, `cwd`: the film's folder, `title`: the film and the step in the user's language, `name`: a short slug, and `prompt`: "STATE.md'den devam et." / "Continue from STATE.md." followed by: load the skill named at the top of `STATE.md` with the Skill tool; run `python3 KIT/scripts/init_film.py . --update-tools` silently; read `STATE.md` ("Resume here" first) and the notes it names; the user's choices at this handoff, verbatim; reply in the user's language; and carry the film on through its gates: the step named here is where to start, never where to stop. This prompt is a handoff, never a helper's brief: no task line, no "done when" line (`brief.py` is for helpers only). The child session opens under this one and starts at once: the user presses nothing.
-- **Claude Code in a terminal, or a desktop app without that tool:** `python3 tools/handoff.py --lang tr` (a new Terminal window already continuing, or a new session with the line in its box).
-- **Anywhere else:** `handoff.py` copies the line; the reply says where to paste it.
-Never leave the user a prefilled box to send, or a line to paste, when a tool can start the chat.
+If no chat tool is available, provide the absolute film path and this prompt.
+`python tools/handoff.py --lang es --dry-run` prints the resume instruction; it does
+not create a chat. Never report that a chat started unless a tool confirms it.
 
-## For the new chat
-1. Load the skill named at the top of `STATE.md` (Claude Code: the Skill tool), run `python3 KIT/scripts/init_film.py . --update-tools` silently, then read `STATE.md`, the "Resume here" block first.
-2. Read only the files it names; never ask for the old chat.
-3. Carry the film on from there, gate after gate: the step a handoff names is where this chat starts, never where it stops.
-4. Continue with "Next action", following `KIT/SKILL.md` and `KIT/references/context-protocol.md`.
+## For the resumed chat
+
+Read the skill, refresh tools, then read `STATE.md` first. Continue from its next
+action without asking again about choices or authorizations already recorded.
